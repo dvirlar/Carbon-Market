@@ -33,9 +33,9 @@ font-size: 20px;
 ```{r setup, include=FALSE}
 
 library(tidyverse)
-#library(gridExtra)
-#library(cowplot)
-#library(grid) # to use grobs
+#library(gridExtra)    # don't know if we'll use
+#library(cowplot)      # don't know if we'll use
+#library(grid) # to use grobs         # don't know if we'll use
 library(extrafont) # to change font in graphs 
 #    font_import() # import fonts
  #   fonts() # check fonts that are now loaded 
