@@ -1,0 +1,164 @@
+---
+title: "Simulating Carbon Markets"
+author: "Daphne Virlar"
+date: "5/30/2019"
+output: html_document
+---
+
+
+<style type="text/css">
+
+h1.title {
+  text-align: center;
+  font-family: "Times New Roman", Times, serif;
+}
+h4.author {
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+  font-size: 26px;
+}
+h4.date { 
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+}
+
+body {
+font-family: "Times New Roman", Times, serif;
+font-size: 20px;
+}
+</style>
+
+
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+#library(gridExtra)
+#library(cowplot)
+#library(grid) # to use grobs
+library(extrafont) # to change font in graphs 
+#    font_import() # import fonts
+ #   fonts() # check fonts that are now loaded 
+
+
+###########################################################################################################
+    # Load data
+carbon <- read.csv("HW4Data.csv")
+
+```
+
+
+
+##Problem 1:
+1. Write down a plausible functional form for the marginal cost of abatement for sectors A, B, C, and D. 
+2. How well do the models fit? What are the parameters? (Kable Table).
+3. Create a plot of the estimated marginal abatement cost functions in all four sectors. **This needs to go into memo**
+```{r}
+# Notes on abatement costs
+
+# Abatement cost is the cost of reducing environmental negatives such as pollution. 
+
+# Although marginal abatement costs can be negative, such as when the low carbon option is cheaper than the business-as-usual option, marginal abatement costs often rise steeply as more pollution is reduced.
+
+############################################################################################################
+
+                           # Create Linear Models for Marginal Abatement Cost Curve
+
+#Create a linear model that explains how marginal cost is influenced by abatement
+    #Creating a linear model to give you the equation of the line.
+
+# Sector A
+abatement_a <- lm(carbon$MC_A ~ carbon$Abatement)
+summary(abatement_a)
+      # intercept = -8.6445
+      # slope = 0.5768
+      # R^2 = 0.904
+  intercept_a <- abatement_a$coefficients[1]
+  slope_a <- abatement_a$coefficients[2]
+  
+  
+# Sector B
+abatement_b <- lm(carbon$MC_B ~ carbon$Abatement)
+summary(abatement_b)
+      # intercept = 9.31770
+      # slope = 0.19874
+      # R^2 = 0.566
+  intercept_b <- abatement_b$coefficients[1]
+  slope_b <- abatement_b$coefficients[2]
+
+# Sector C
+abatement_c <- lm(carbon$MC_C ~ carbon$Abatement)
+summary(abatement_c)
+      # intercept = -11.655
+      # slope = 0.78383
+      # R^2 = 0.8752
+  intercept_c <- abatement_c$coefficients[1]
+  slope_c <- abatement_c$coefficients[2]
+
+  
+# Sector D
+abatement_d <- lm(carbon$MC_D ~ carbon$Abatement)
+summary(abatement_d)
+      # intercept = 9.68751
+      # slope = 0.25993
+      # R^2 = 0.5434
+  intercept_d <- abatement_d$coefficients[1]
+  slope_d <- abatement_d$coefficients[2]
+    
+
+############################################################################################################
+
+                               # Write functions for Marginal Abatement Cost Curve
+
+# Sector A
+curve_a <- function(x){
+  intercept_a + slope_a*x
+}
+
+  
+# Sector B
+curve_b <- function(x){
+  intercept_b + slope_b*x
+}
+
+  
+# Sector C
+curve_c <- function(x){
+  intercept_c + slope_c*x
+}
+
+
+# Sector D
+curve_d <- function(x){
+  intercept_d + slope_d*x
+}
+
+```
+
+
+------ insert section including all the linear regessions written out ---------
+
+
+
+```{r}
+# create a kable table listing the parameters of each regression, and the R^2 value. Rows = each sector
+
+```
+
+
+
+```{r}
+# Create all the plots, and arrange them in a single frame
+      # when creating the plots, don't necessarily need to graph by function... Sam said we could draw the         lines on. Can you integrate this?
+```
+
+
+
+##Problem 2
+1. Derive demand curve for each sector
+2. Plot the demand curves
+3. Which sector is willing to pay the most? (This will be the one with the highest intercept)
+```{r}
+
+```
+
