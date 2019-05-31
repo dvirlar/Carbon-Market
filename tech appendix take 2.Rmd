@@ -39,6 +39,7 @@ library(tidyverse)
 library(extrafont) # to change font in graphs 
 #    font_import() # import fonts
  #   fonts() # check fonts that are now loaded 
+library(kableExtra)
 
 
 ###########################################################################################################
@@ -148,8 +149,33 @@ curve_d <- function(x){
 
 
 ```{r}
-# Create all the plots, and arrange them in a single frame
-      # when creating the plots, don't necessarily need to graph by function... Sam said we could draw the         lines on. Can you integrate this?
+# I went way overboard originally with how I created the graphs. This time, I'm essentially copying what I did in the Gas Tax assignment. That is, 
+        # graphing multiple functions on one graph, 
+        # assigning a name to each of them, 
+        # and color coding them
+
+ggplot(data.frame(x = c(0, 350))) + # setting a data frame basically allows for R to evaluating the function along those values
+  stat_function(fun = curve_a, aes(color = "A")) +
+  stat_function(fun = curve_b, aes(color = "B")) +
+  stat_function(fun = curve_c, aes(color = "C")) +
+  stat_function(fun = curve_d, aes(color = "D")) +
+                             # color is set to the name so that it's easier to fix                                                        the legend later on
+  ###
+  # without setting the axes, nothing shows up.
+  scale_y_continuous(limits= c(-10,100), expand = c(0,0)) +
+  scale_x_continuous(limits= c(0, 350), expand = c(0,0)) + 
+            # x axis is set to 350 because sector D emits up to 300 tons of carbon. So that's at least how               much they'll have to abate
+  ###
+  labs(fill = "", color = "Sectors") + # this changes the title of the legend
+  xlab("\n Carbon Abatement (ton)") + 
+  ylab("Carbon Value \n($/ton) \n") + # should this just be marginal cost? 
+  ggtitle("Marginal Cost of Abatement\n") + # this needs to be centered
+  ###
+  theme(plot.title = element_text(hjust = 0.5), # centers the title
+        axis.title.y = element_text(angle=0, hjust = 0.5, vjust = 0.5)) # Rotates y lab 90 deg, and centers
+
+
+
 ```
 
 
