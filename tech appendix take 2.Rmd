@@ -143,9 +143,10 @@ curve_d <- function(x){
 
 ```{r}
 # create a kable table listing the parameters of each regression, and the R^2 value. Rows = each sector
-
+sector_table <- kable(round(carbon, 3)) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"))
+sector_table
 ```
-
 
 
 ```{r}
