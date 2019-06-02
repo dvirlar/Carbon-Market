@@ -143,6 +143,112 @@ curve_d <- function(x){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```{r}
 # create a kable table listing the parameters of each regression, and the R^2 value. Rows = each sector
 
@@ -200,12 +306,44 @@ ggplot(data.frame(x = c(0, 350))) + # setting a data frame basically allows for 
 
                                # Write functions for Each Sectors Demand Curve
 
+# Find marginal abatement costs for each sector. This will be the new intercept values for 
+# plugging into y = mx + b. 
+
+y_interceptA <- curve_a(180)
+y_interceptB <- curve_b(200)
+y_interceptC <- curve_c(220)
+y_interceptD <- curve_d(300)
 
 
 
+
+# Create Equations by Sector
+
+demand_a <- function(x){
+  # intercept  +     slope * x
+  y_interceptA + (-y_interceptA / 180)*x
+}
+
+
+demand_b <- function(x){
+  # intercept  +     slope * x
+  y_interceptB + (-y_interceptB / 200)*x
+}
+
+
+demand_c <- function(x){
+  # intercept  +     slope * x
+  y_interceptC + (-y_interceptC / 220)*x
+}
+
+demand_d <- function(x){
+  # intercept  +     slope * x
+  y_interceptD + (-y_interceptD / 300)*x
+}
 
 
 
 
 ```
+
 
