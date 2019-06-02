@@ -54,7 +54,7 @@ carbon <- read.csv("HW4Data.csv")
 1. Write down a plausible functional form for the marginal cost of abatement for sectors A, B, C, and D. 
 2. How well do the models fit? What are the parameters? (Kable Table).
 3. Create a plot of the estimated marginal abatement cost functions in all four sectors. **This needs to go into memo**
-```{r}
+```{r, include= FALSE}
 # Notes on abatement costs
 
 # Abatement cost is the cost of reducing environmental negatives such as pollution. 
@@ -76,17 +76,18 @@ summary(abatement_a)
       # R^2 = 0.904
   intercept_a <- abatement_a$coefficients[1]
   slope_a <- abatement_a$coefficients[2]
-  
+  r_a <- 0.904
   
 # Sector B
 abatement_b <- lm(carbon$MC_B ~ carbon$Abatement)
 summary(abatement_b)
       # intercept = 9.31770
       # slope = 0.19874
-      # R^2 = 0.566
+      # R^2 = 0.5355
   intercept_b <- abatement_b$coefficients[1]
   slope_b <- abatement_b$coefficients[2]
-
+  r_b <- 0.5355
+  
 # Sector C
 abatement_c <- lm(carbon$MC_C ~ carbon$Abatement)
 summary(abatement_c)
@@ -95,7 +96,7 @@ summary(abatement_c)
       # R^2 = 0.8752
   intercept_c <- abatement_c$coefficients[1]
   slope_c <- abatement_c$coefficients[2]
-
+  r_c <- 0.8752
   
 # Sector D
 abatement_d <- lm(carbon$MC_D ~ carbon$Abatement)
@@ -105,6 +106,7 @@ summary(abatement_d)
       # R^2 = 0.5434
   intercept_d <- abatement_d$coefficients[1]
   slope_d <- abatement_d$coefficients[2]
+  r_d <- 0.5434
     
 
 ############################################################################################################
@@ -143,7 +145,15 @@ curve_d <- function(x){
 
 ```{r}
 # create a kable table listing the parameters of each regression, and the R^2 value. Rows = each sector
-sector_table <- kable(round(carbon, 3)) %>% 
+
+# create a new data frame
+kable_data <- data.frame("Sector" = c("A", "B", "C", "D"),
+                         "Intercept" = round(c(intercept_a, intercept_b, intercept_c, intercept_d), 4),
+                         "Slope" = round(c(slope_a, slope_b, slope_c, slope_d), 4),
+                         "R-Squared" = c(r_a, r_b, r_c, r_d))
+
+sector_table <- kable(kable_data,
+                      col.names = c("Sector", "Intercept", "Slope", "R-Squared" )) %>% 
   kable_styling(bootstrap_options = c("striped", "hover", "bordered"))
 sector_table
 ```
@@ -163,7 +173,7 @@ ggplot(data.frame(x = c(0, 350))) + # setting a data frame basically allows for 
                              # color is set to the name so that it's easier to fix                                                        the legend later on
   ###
   # without setting the axes, nothing shows up.
-  scale_y_continuous(limits= c(-10,100), expand = c(0,0)) +
+  scale_y_continuous(limits= c(-15,120), expand = c(0,0)) +
   scale_x_continuous(limits= c(0, 350), expand = c(0,0)) + 
             # x axis is set to 350 because sector D emits up to 300 tons of carbon. So that's at least how               much they'll have to abate
   ###
@@ -186,6 +196,16 @@ ggplot(data.frame(x = c(0, 350))) + # setting a data frame basically allows for 
 2. Plot the demand curves
 3. Which sector is willing to pay the most? (This will be the one with the highest intercept)
 ```{r}
+############################################################################################################
+
+                               # Write functions for Each Sectors Demand Curve
+
+
+
+
+
+
+
 
 ```
 
