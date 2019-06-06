@@ -143,120 +143,14 @@ curve_d <- function(x){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r}
+```{r, echo=FALSE, message=TRUE}
 # create a kable table listing the parameters of each regression, and the R^2 value. Rows = each sector
 
 # create a new data frame
 kable_data <- data.frame("Sector" = c("A", "B", "C", "D"),
-                         "Intercept" = round(c(intercept_a, intercept_b, intercept_c, intercept_d), 4),
-                         "Slope" = round(c(slope_a, slope_b, slope_c, slope_d), 4),
-                         "R-Squared" = c(r_a, r_b, r_c, r_d))
+                         "Intercept" = round(c(intercept_a, intercept_b, intercept_c, intercept_d), 2),
+                         "Slope" = round(c(slope_a, slope_b, slope_c, slope_d), 2),
+                         "R-Squared" = round(c(r_a, r_b, r_c, r_d), 2))
 
 sector_table <- kable(kable_data,
                       col.names = c("Sector", "Intercept", "Slope", "R-Squared" )) %>% 
@@ -265,7 +159,7 @@ sector_table
 ```
 
 
-```{r}
+```{r, include=FALSE, echo=TRUE}
 # I went way overboard originally with how I created the graphs. This time, I'm essentially copying what I did in the Gas Tax assignment. That is, 
         # graphing multiple functions on one graph, 
         # assigning a name to each of them, 
@@ -346,4 +240,99 @@ demand_d <- function(x){
 
 ```
 
+
+```{r}
+ggplot(data.frame(x = c(0, 350))) + # setting a data frame basically allows for R to evaluating the function along those values
+  stat_function(fun = demand_a, aes(color = "A")) +
+  stat_function(fun = demand_b, aes(color = "B")) +
+  stat_function(fun = demand_c, aes(color = "C")) +
+  stat_function(fun = demand_d, aes(color = "D")) +
+                             # color is set to the name so that it's easier to fix                                                        the legend later on
+  ###
+  # without setting the axes, nothing shows up.
+  scale_y_continuous(limits= c(0, 170), expand = c(0,0)) +
+  scale_x_continuous(limits= c(0, 300), expand = c(0,0)) + 
+
+  ###
+  labs(fill = "", color = "Sectors") + # this changes the title of the legend
+  xlab("\n Carbon Pollution (ton)") + 
+  ylab("Carbon Value \n($/ton) \n") + # should this just be marginal cost? 
+  ggtitle("Marginal Cost of Pollution\n") + # this needs to be centered
+  ###
+  theme(plot.title = element_text(hjust = 0.5), # centers the title
+        axis.title.y = element_text(angle=0, hjust = 0.5, vjust = 0.5)) # Rotates y lab 90 deg, and centers
+
+
+```
+
+
+## Part 3
+```{r}
+# Part A, Section 1
+  # The total cost of meeting the target in country X
+      # Emissions cut by 100 tons
+
+# We are integrating because our "curve_X" functions are the MARGINAL abatement cost. Any marginal curve is the DERIVATIVE of a total curve. Therefore, to find the TOTAL emissions, we need to integrate under the curve in order to find the total price of abating 100 tons of carbon.
+cost_A = integrate(curve_a, 0, 100)
+cost_B = integrate(curve_b, 0, 100)
+cost_C = integrate(curve_c, 0, 100)
+total_cost = cost_A$value + cost_B$value + cost_C$value  
+
+
+```
+
+
+
+```{r, echo=FALSE, message=TRUE}
+# Part A, Section 2
+  # The cost to each sector
+
+cb_data <- data.frame("Sectors" = c("A", "B", "C", "Total"),
+                      "Abating" = c(round(cost_A$value, 2),
+                                            round(cost_B$value, 2),
+                                            round(cost_C$value, 2),
+                                            round(cost_A$value + cost_B$value + cost_C$value, 2)))
+
+
+cb_table <- cb_data %>% 
+  kable(col.names = c("Sectors", "Cost of Abating"),
+        align = rep('c', 5)) %>% 
+  kable_styling(bootstrap_options = c("striped", "condensed"), position = "center", full_width = F)
+
+cb_table
+
+```
+
+#####The above kable table indicates the cost of abating by sector, along with the total cost for Country X. The total benefit of polluting, theoretically, should be the same for each sector.
+
+```{r}
+
+# Sector A
+  intercept_a <- abatement_a$coefficients[1]
+  slope_a <- abatement_a$coefficients[2]
+  
+# Sector B
+  intercept_b <- abatement_b$coefficients[1]
+  slope_b <- abatement_b$coefficients[2]
+
+  
+# Sector C
+  intercept_c <- abatement_c$coefficients[1]
+  slope_c <- abatement_c$coefficients[2]
+  
+# Sector D
+  intercept_d <- abatement_d$coefficients[1]
+  slope_d <- abatement_d$coefficients[2]
+
+
+# Aggregate Slope
+Slope_ag =(1/slope_a)+(1/slope_b)+(1/slope_c)
+
+# Aggregate Intercept 
+Intercept_ag = (-(intercept_a/slope_a)-(intercept_b/slope_b)-(intercept_c/slope_c))
+
+
+# For 3-A-3, we are finding the AREA UNDER THE CURVE. We need to find the tax on carbon first. This will be the y-intercept for where x=300 on the aggregate supply curve. Then, we need to integrate from 0 to 300. This integration is what gives us the tax revenue generated.
+
+```
 
