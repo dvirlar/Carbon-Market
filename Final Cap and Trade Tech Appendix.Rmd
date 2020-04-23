@@ -1,0 +1,558 @@
+---
+title: "Cap and Trade Technical Appendix"
+author: "Daphne Virlar & Eva Marrero"
+date: "6/7/2019"
+output: html_document
+---
+
+
+<style type="text/css">
+
+h1.title {
+  text-align: center;
+  font-family: "Times New Roman", Times, serif;
+}
+h4.author {
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+  font-size: 26px;
+}
+h4.date { 
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+}
+
+body {
+font-family: "Times New Roman", Times, serif;
+font-size: 20px;
+}
+</style>
+
+
+*-----------------------------------------------------------------------------------------------------------------------------------------------------*
+
+## Problem 1
+```{r, include=F, echo=F}
+library(tidyverse)
+#library(gridExtra)    # don't know if we'll use
+#library(cowplot)      # don't know if we'll use
+#library(grid) # to use grobs         # don't know if we'll use
+library(extrafont) # to change font in graphs 
+#    font_import() # import fonts
+ #   fonts() # check fonts that are now loaded 
+library(kableExtra)
+
+
+###########################################################################################################
+    # Load data
+carbon <- read.csv("HW4Data.csv")
+
+abatement_a <- lm(carbon$MC_A ~ carbon$Abatement)
+summary(abatement_a)
+      # intercept = -8.6445
+      # slope = 0.5768
+      # R^2 = 0.904
+  intercept_a <- abatement_a$coefficients[1]
+  slope_a <- abatement_a$coefficients[2]
+  r_a <- 0.904
+  
+# Sector B
+abatement_b <- lm(carbon$MC_B ~ carbon$Abatement)
+summary(abatement_b)
+      # intercept = 9.31770
+      # slope = 0.19874
+      # R^2 = 0.5355
+  intercept_b <- abatement_b$coefficients[1]
+  slope_b <- abatement_b$coefficients[2]
+  r_b <- 0.5355
+  
+# Sector C
+abatement_c <- lm(carbon$MC_C ~ carbon$Abatement)
+summary(abatement_c)
+      # intercept = -11.655
+      # slope = 0.78383
+      # R^2 = 0.8752
+  intercept_c <- abatement_c$coefficients[1]
+  slope_c <- abatement_c$coefficients[2]
+  r_c <- 0.8752
+  
+# Sector D
+abatement_d <- lm(carbon$MC_D ~ carbon$Abatement)
+summary(abatement_d)
+      # intercept = 9.68751
+      # slope = 0.25993
+      # R^2 = 0.5434
+  intercept_d <- abatement_d$coefficients[1]
+  slope_d <- abatement_d$coefficients[2]
+  r_d <- 0.5434
+
+
+
+
+```
+
+
+```{r,echo=F, messages=T}
+kable_data <- data.frame("Sector" = c("A", "B", "C", "D"),
+                         "Intercept" = round(c(intercept_a, intercept_b, intercept_c, intercept_d), 2),
+                         "Slope" = round(c(slope_a, slope_b, slope_c, slope_d), 2),
+                         "R-Squared" = round(c(r_a, r_b, r_c, r_d), 2))
+
+sector_table <- kable(kable_data,
+                      col.names = c("Sector", "Intercept", "Slope", "R-Squared" )) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"), full_width=F)
+sector_table
+```
+######**Table 1.** The above table illustrates the slope and intercepts for each sectors Marginal Cost of Abatement curves. It also includes r-squred values, to indicate how well the functions fit their data. Sectors B and D do not have appropriately fitting functions, and would potentially benefit from piecewise or quadratic equations, rather than a linear one.
+
+<br>
+<br>
+
+\[
+\begin{eqnarray}
+Sector~A = `r {round(slope_a,2)}`x - `r {round(-intercept_a,2)}`
+\end{eqnarray}
+\]
+
+
+\[
+\begin{eqnarray}
+Sector~B = `r {round(slope_b,2)}`x + `r {round(intercept_b,2)}`
+\end{eqnarray}
+\]
+
+
+\[
+\begin{eqnarray}
+Sector~C = `r {round(slope_c,2)}`x - `r {round(-intercept_c,2)}`
+\end{eqnarray}
+\]
+
+
+\[
+\begin{eqnarray}
+Sector~D = `r {round(slope_d,2)}`x + `r {round(intercept_d,2)}`
+\end{eqnarray}
+\]
+
+
+```{r, echo=F}
+
+# Sector A
+curve_a <- function(x){
+  intercept_a + slope_a*x
+}
+
+  
+# Sector B
+curve_b <- function(x){
+  intercept_b + slope_b*x
+}
+
+  
+# Sector C
+curve_c <- function(x){
+  intercept_c + slope_c*x
+}
+
+
+# Sector D
+curve_d <- function(x){
+  intercept_d + slope_d*x
+}
+
+```
+
+<br>
+<br>
+
+```{r, echo=FALSE, warning=FALSE, fig.align= "center"}
+MCA <- ggplot(data.frame(x = c(0, 350))) + # setting a data frame basically allows for R to evaluating the function along those values
+  stat_function(fun = curve_a, aes(color = "A")) +
+  stat_function(fun = curve_b, aes(color = "B")) +
+  stat_function(fun = curve_c, aes(color = "C")) +
+  stat_function(fun = curve_d, aes(color = "D")) +
+                             # color is set to the name so that it's easier to fix                                                        the legend later on
+  ###
+  # without setting the axes, nothing shows up.
+  scale_y_continuous(limits= c(-15,120), expand = c(0,0)) +
+  scale_x_continuous(limits= c(0, 350), expand = c(0,0)) + 
+            # x axis is set to 350 because sector D emits up to 300 tons of carbon. So that's at least how               much they'll have to abate
+  ###
+  labs(fill = "", color = "Sectors") + # this changes the title of the legend
+  xlab("\n Carbon Abatement (ton)") + 
+  ylab("Carbon Value \n($/ton) \n") + # should this just be marginal cost? 
+  ggtitle("Marginal Cost of Abatement\n") + # this needs to be centered
+  ###
+  theme_classic()+
+  theme(plot.title = element_text(hjust = 0.5), # centers the title
+        axis.title.y = element_text(angle=0, hjust = 0.5, vjust = 0.5)) # Rotates y lab 90 deg, and centers
+
+MCA
+```
+
+
+
+<br>
+
+##Problem 2
+```{r, include=FALSE}
+############################################################################################################
+
+                               # Write functions for Each Sectors Demand Curve
+
+# Find marginal abatement costs for each sector. This will be the new intercept values for 
+# plugging into y = mx + b. 
+
+y_interceptA <- curve_a(180)
+y_interceptB <- curve_b(200)
+y_interceptC <- curve_c(220)
+y_interceptD <- curve_d(300)
+
+
+
+
+# Create Equations by Sector
+
+demand_a <- function(x){
+  # intercept  +     slope * x
+  y_interceptA + (-y_interceptA / 180)*x
+}
+
+
+demand_b <- function(x){
+  # intercept  +     slope * x
+  y_interceptB + (-y_interceptB / 200)*x
+}
+
+
+demand_c <- function(x){
+  # intercept  +     slope * x
+  y_interceptC + (-y_interceptC / 220)*x
+}
+
+demand_d <- function(x){
+  # intercept  +     slope * x
+  y_interceptD + (-y_interceptD / 300)*x
+}
+
+
+```
+
+
+<br>
+<br>
+
+\[
+\begin{eqnarray}
+Sector~A = `r {round(-y_interceptA / 180,2)}`x - `r {round(y_interceptA,2)}`
+\end{eqnarray}
+\]
+
+
+\[
+\begin{eqnarray}
+Sector~B = `r {round(-y_interceptB / 200,2)}`x + `r {round(y_interceptB,2)}`
+\end{eqnarray}
+\]
+
+
+\[
+\begin{eqnarray}
+Sector~C = `r {round(-y_interceptC / 220,2)}`x - `r {round(y_interceptC,2)}`
+\end{eqnarray}
+\]
+
+
+\[
+\begin{eqnarray}
+Sector~D = `r {round(-y_interceptD / 300,2)}`x + `r {round(y_interceptD,2)}`
+\end{eqnarray}
+\]
+
+
+<br>
+<br>
+
+
+
+```{r, echo=FALSE, warning=FALSE, fig.align= "center"}
+ggplot(data.frame(x = c(0, 350))) + # setting a data frame basically allows for R to evaluating the function along those values
+  stat_function(fun = demand_a, aes(color = "A")) +
+  stat_function(fun = demand_b, aes(color = "B")) +
+  stat_function(fun = demand_c, aes(color = "C")) +
+  stat_function(fun = demand_d, aes(color = "D")) +
+                             # color is set to the name so that it's easier to fix                                                        the legend later on
+  ###
+  # without setting the axes, nothing shows up.
+  scale_y_continuous(limits= c(0, 170), expand = c(0,0)) +
+  scale_x_continuous(limits= c(0, 300), expand = c(0,0)) + 
+
+  ###
+  labs(fill = "", color = "Sectors") + # this changes the title of the legend
+  xlab("\n Carbon Pollution (ton)") + 
+  ylab("Carbon Value \n($/ton) \n") + # should this just be marginal cost? 
+  ggtitle("Marginal Cost of Pollution\n") + # this needs to be centered
+  ###
+  theme_classic()+
+  theme(plot.title = element_text(hjust = 0.5), # centers the title
+        axis.title.y = element_text(angle=0, hjust = 0.5, vjust = 0.5)) # Rotates y lab 90 deg, and centers
+
+```
+
+
+
+```{r, include=FALSE, echo=FALSE, warning=FALSE}
+# Part A, Section 1
+  # The total cost of meeting the target in country X
+      # Emissions cut by 100 tons
+
+# Set values equal to original emission values
+
+A = 180
+B = 200
+C = 220
+
+# We are integrating because our "curve_X" functions are the MARGINAL abatement cost. Any marginal curve is the DERIVATIVE of a total curve. Therefore, to find the TOTAL emissions, we need to integrate under the curve in order to find the total price of abating 100 tons of carbon.
+
+cost_A = integrate(curve_a, 0, A-100)$value
+cost_B = integrate(curve_b, 0, B-100)$value
+cost_C = integrate(curve_c, 0, C-100)$value
+total_cost = cost_A + cost_B + cost_C  
+
+
+```
+
+
+<br>
+<br>
+
+## Problem 3
+```{r, include=FALSE, echo=FALSE, warning=FALSE}
+###########################################################################################################
+# 3-B 
+                             # Finding the aggregate cost curve to find the tax
+
+# Sector A
+  intercept_a <- abatement_a$coefficients[1]
+  slope_a <- abatement_a$coefficients[2]
+  
+# Sector B
+  intercept_b <- abatement_b$coefficients[1]
+  slope_b <- abatement_b$coefficients[2]
+
+  
+# Sector C
+  intercept_c <- abatement_c$coefficients[1]
+  slope_c <- abatement_c$coefficients[2]
+  
+# Sector D
+  intercept_d <- abatement_d$coefficients[1]
+  slope_d <- abatement_d$coefficients[2]
+
+
+# Aggregate Slope in terms of X
+Slope_ag =(1/slope_a)+(1/slope_b)+(1/slope_c)
+
+# Aggregate Intercept in terms of X
+Intercept_ag = (-(intercept_a/slope_a)-(intercept_b/slope_b)-(intercept_c/slope_c))
+
+
+###########################################################################################################
+
+
+# Aggregate Cost of Abating in terms of Y
+Ag_Cost <- function(x){
+  # slope     +     Intercept
+  (x/Slope_ag) + ((-Intercept_ag)/Slope_ag)
+}
+
+tax_price <- Ag_Cost(300)
+# For 3-B-3, we are finding the AREA UNDER THE CURVE. We need to find the tax on carbon first. This will be the y-intercept for where x=300 on the aggregate supply curve. Then, we need to integrate from 0 to 300. This integration is what gives us the tax revenue generated.
+
+###########################################################################################################
+
+              # Find the optimum quantity to each sector, given the current tax previously calculated
+
+# Sector A's x-intercept, at the aggregate cost price/tax (tau)
+a_x_int <- (tax_price - intercept_a)/slope_a
+           # 83.33
+
+# Sector B
+b_x_int <- (tax_price - intercept_b)/slope_b
+          # 151.49
+
+# Sector C
+c_x_int <- (tax_price - intercept_c)/slope_c
+          # 65.16
+
+###########################################################################################################
+
+opt_cost_a <- (integrate(curve_a, lower =0, upper =a_x_int)$value)
+
+opt_cost_b <- (integrate(curve_b, lower = 0, upper = b_x_int)$value)
+
+opt_cost_c <- integrate(curve_c, lower = 0, upper = c_x_int)$value
+
+
+opt_total_X <- opt_cost_a + opt_cost_b + opt_cost_c
+
+
+###########################################################################################################
+
+              # Find the tax revenue. This is the area under the price * the carbon cap
+
+tax_revenue <- tax_price*300   # This is equal to the sum of the taxes by sector
+
+
+
+###########################################################################################################
+###########################################################################################################
+###########################################################################################################
+
+
+
+
+
+
+tax_price <- Ag_Cost(300)
+
+
+
+###########################################################################################################
+
+                                   # Tau's Corresponding X-Intercepts
+
+# To find the cost to each sector, need to set equations in terms of X. Then put in the tax value for y, and that will give you the intersect value where the price intersects the curve (can use uniroot function, should give the same answer).
+
+
+# Sector A's x-intercept, at the aggregate cost price/tax (tau)
+a_x_int <- (tax_price - intercept_a)/slope_a
+           # 83.33
+
+# Sector B
+b_x_int <- (tax_price - intercept_b)/slope_b
+          # 151.49
+
+# Sector C
+c_x_int <- (tax_price - intercept_c)/slope_c
+          # 65.16
+
+
+###########################################################################################################
+
+                                  # Total Cost per Sector of Cap n Trade
+
+total_a <- (integrate(curve_a, lower =0, upper =a_x_int)$value) + ((100-a_x_int)*tax_price)
+  # total cost = 1939.66
+  # 16.665 = number of permits sector a needs to buy
+
+total_b <- (integrate(curve_b, lower = 0, upper = b_x_int)$value) + ((100-b_x_int)*tax_price)
+  # total cost = 1661.977
+  # -51 --> THIS NEGATIVE NUMBER CAN BE TRANSLATED TO MEAN: Sector B has 51.49 credits they can sell
+
+total_c <- integrate(curve_c, lower = 0, upper = c_x_int)$value + ((100-c_x_int)*tax_price)
+  # total cost = 2278.176
+  # 34.831 = number of permits sector c needs to buy
+
+
+
+# Calculate the Total Cost to Country X
+
+
+###########################################################################################################
+
+                                  # Total Cost for Country X of Cap n Trade
+
+countryx_totalcost <- total_a + total_b + total_c
+        # 5,879.812
+
+
+```
+
+
+```{r, echo=FALSE, message=TRUE}
+# Part 3: Policy Options, their associated costs, and revenue
+
+cb_data <- data.frame("Sectors" = c("A", "B", "C", "Total", "Tax Revenue"),
+                      "Carbon_Cap" = c(round(cost_A, 2),
+                                            round(cost_B, 2),
+                                            round(cost_C, 2),
+                                            round(cost_A + cost_B + cost_C, 2),
+                                       0),
+                      "Carbon_Tax" = c(round(opt_cost_a, 2),
+                                       round(opt_cost_b, 2),
+                                       round(opt_cost_c, 2),
+                                       round(opt_total_X,2),
+                                       round(tax_revenue,2)),
+                      "CapTrade" = c(round(total_a,2),
+                                     round(total_b,2),
+                                     round(total_c,2),
+                                     round(countryx_totalcost,2),
+                                     0))
+
+
+cnt_table <- cb_data %>% 
+  kable(col.names = c("Sectors", "Policy A: \nCap on Carbon", "Policy B: Carbon Tax", "Policy C: Cap and Trade"),
+        align = rep('c', 5)) %>% 
+  kable_styling(bootstrap_options = c("striped", "condensed"), position = "center", full_width = T)
+
+cnt_table
+
+```
+######**Table 2.** The above kable table indicates the outcomes of three different policy options. An important thing to note, there is no tax revenue generated when there is a cap on carbon, or in a cap and trade situation. However, a carbon tax does provide tax revenue. Additionally, the total cost of abating carbon emissions is the same regardless of whether you impose a carbon tax, or if you implement a cap and trade program. The main difference is that a cap and trade program satisfies the *Equal Marginal Principle*, and therefor is the (theoretically) more equitable solution. 
+
+
+
+
+##Problem 4
+```{r, echo=FALSE, warning=FALSE}
+
+# Sector A
+  intercept_a <- abatement_a$coefficients[1]
+  slope_a <- abatement_a$coefficients[2]
+  
+# Sector B
+  intercept_b <- abatement_b$coefficients[1]
+  slope_b <- abatement_b$coefficients[2]
+
+  
+# Sector C
+  intercept_c <- abatement_c$coefficients[1]
+  slope_c <- abatement_c$coefficients[2]
+  
+# Sector D
+  intercept_d <- abatement_d$coefficients[1]
+  slope_d <- abatement_d$coefficients[2]
+
+
+# Aggregate Slope in terms of X
+All_slope_ag =(1/slope_a)+(1/slope_b)+(1/slope_c)+(1/slope_d)
+
+# Aggregate Intercept in terms of X with D included:
+All_intercept_ag = (-(intercept_a/slope_a)-(intercept_b/slope_b)-(intercept_c/slope_c)-(intercept_d/slope_d))
+
+totalag <- function(x){
+  (x/All_slope_ag)+((-All_intercept_ag)/All_slope_ag)
+}
+totalag_price <- totalag(300)
+
+#The new amount of Carbon with D factored in ($29.80)
+# demand_d(totalag_price)
+# #77.38
+
+#Profit for Sector D: $778.13
+D_profit <- integrate(curve_d, 0, 77.38)$value - (77.38*29.80)
+
+
+```
+
+The new aggregate demand curve is as follows:
+\[
+\begin{eqnarray}
+Cost~of~Abating = `r {round(All_slope_ag,2)}`x - `r {round(-All_intercept_ag,2)}`
+\end{eqnarray}
+\]
+
+
+The new price associated with the optimal carbon emissions (77.38 tons, sector D) is \$29.80. If Sector D were to enter the market, it would see a net benefit of $778.13. The net benefit was calculated in the following way by finding the area under Sector D's "supply" curve from 0 to 77.38, and then subtracting the product of 77.38 and 29.80.
